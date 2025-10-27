@@ -1,0 +1,61 @@
+Name,ManaCost,Type,Rarity,SetName,CollectorNumber,MarketValue,IsFoil
+Plains,None,Land,Common,Core Set 2021,250,0.10,false
+Island,None,Land,Common,Core Set 2021,251,0.10,false
+Swamp,None,Land,Common,Core Set 2021,252,0.10,false
+Mountain,None,Land,Common,Core Set 2021,253,0.10,false
+Forest,None,Land,Common,Core Set 2021,254,0.10,false
+Serra Angel,{3}{W}{W},Creature,Uncommon,Core Set 2021,15,0.25,false
+Pacifism,{1}{W},Enchantment,Common,Core Set 2021,32,0.10,false
+Day of Judgment,{2}{W}{W},Sorcery,Rare,Zendikar Rising,25,1.50,false
+Swords to Plowshares,{W},Instant,Uncommon,Commander Legends,12,0.80,false
+Counterspell,{U}{U},Instant,Uncommon,Modern Horizons 2,45,0.60,false
+Opt,{U},Instant,Common,Core Set 2021,59,0.15,false
+Cancel,{1}{U}{U},Instant,Common,Core Set 2021,61,0.10,false
+Storm Crow,{1}{U},Creature,Common,Commander Legends,52,0.10,false
+Doom Blade,{1}{B},Instant,Uncommon,Core Set 2021,94,0.20,false
+Murder,{1}{B}{B},Instant,Common,Core Set 2021,95,0.10,false
+Duress,{B},Sorcery,Common,Core Set 2021,90,0.10,false
+Lightning Bolt,{R},Instant,Uncommon,Core Set 2021,130,0.75,false
+Shock,{R},Instant,Common,Core Set 2021,132,0.10,false
+Flame Slash,{R},Sorcery,Common,Commander Legends,129,0.10,false
+Chain Lightning,{R},Sorcery,Uncommon,Commander Legends,123,0.50,false
+Llanowar Elves,{G},Creature,Common,Core Set 2021,163,0.10,false
+Giant Growth,{G},Instant,Common,Core Set 2021,165,0.10,false
+Cultivate,{2}{G},Sorcery,Uncommon,Core Set 2021,167,0.30,false
+Garruk, Primal Hunter,{2}{G}{G}{G},Planeswalker,Mythic Rare,12,172,2.50,true
+Overrun,{2}{G}{G}{G},Sorcery,Uncommon,Core Set 2021,180,0.20,false
+Elvish Mystic,{G},Creature,Common,M15,162,0.10,false
+Azorius Guildmage,{W}{U},Creature,Uncommon,Ravnica,21,0.25,false
+Rakdos Cackler,{B}{R},Creature,Uncommon,Return to Ravnica,75,0.20,false
+Golgari Rot Farm,None,Land,Uncommon,Ravnica,243,0.15,false
+Simic Growth Chamber,None,Land,Uncommon,Ravnica,247,0.15,false
+Izzet Guildmage,{U}{R},Creature,Uncommon,Ravnica,84,0.30,false
+Gruul Signet,{2},Artifact,Uncommon,Ravnica,201,0.50,false
+Selesnya Sanctuary,None,Land,Uncommon,Ravnica,248,0.15,false
+Dimir Signet,{2},Artifact,Uncommon,Ravnica,199,0.50,false
+Solemn Simulacrum,{4},Artifact,Rare,Commander Legends,210,0.75,false
+Lightning Greaves,{2},Artifact,Uncommon,Commander Legends,203,0.50,false
+Sol Ring,{1},Artifact,Uncommon,Commander Legends,217,1.25,false
+Command Tower,None,Land,Uncommon,Commander Legends,300,0.50,false
+Arcane Signet,{2},Artifact,Uncommon,Commander Legends,304,0.75,false
+Evolving Wilds,None,Land,Common,Core Set 2021,257,0.10,false
+Swiftfoot Boots,{2},Artifact,Uncommon,Core Set 2021,215,0.40,false
+Path to Exile,{W},Instant,Uncommon,Modern Masters,13,1.50,false
+Temple Garden,None,Land,Rare,Ravnica,281,2.00,false
+Watery Grave,None,Land,Rare,Ravnica,283,2.00,false
+Blood Crypt,None,Land,Rare,Ravnica,284,2.00,false
+Stomping Ground,None,Land,Rare,Ravnica,285,2.00,false
+Godless Shrine,None,Land,Rare,Ravnica,286,2.00,false
+Sacred Foundry,None,Land,Rare,Ravnica,287,2.00,false
+Steam Vents,None,Land,Rare,Ravnica,288,2.00,false
+Overgrown Tomb,None,Land,Rare,Ravnica,289,2.00,false
+Breeding Pool,None,Land,Rare,Ravnica,290,2.00,false
+Questing Beast,{2}{G}{G},Creature,Mythic Rare,Throne of Eldraine,171,5.00,false
+Thought Erasure,{U}{B},Sorcery,Uncommon,Guilds of Ravnica,206,0.25,false
+Bonecrusher Giant,{1}{R},Creature,Rare,Throne of Eldraine,115,1.50,false
+Expressive Iteration,{U}{R},Sorcery,Rare,Strixhaven,186,2.00,false
+Esper Sentinel,{W},Creature,Rare,Modern Horizons 2,12,4.50,false
+The Great Henge,{7}{G}{G},Artifact,Mythic Rare,Throne of Eldraine,161,10.00,true
+Fabled Passage,None,Land,Rare,Throne of Eldraine,244,2.50,false
+Fatal Push,{B},Instant,Uncommon,Aether Revolt,57,1.00,false
+Lightning Helix,{R}{W},Instant,Uncommon,Ravnica,215,0.50,false
