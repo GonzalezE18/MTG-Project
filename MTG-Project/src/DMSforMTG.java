@@ -3,6 +3,9 @@ import java.util.*;
 public class DMSforMTG {
     private List<Card> collection = new ArrayList<>();
     private Scanner scanner = new Scanner(System.in);
+    private CardDAO cardDAO = new CardDAO();
+    private DeckDAO deckDAO = new DeckDAO();
+
 
     public static void main(String[] args) {
         DMSforMTG app = new DMSforMTG();
@@ -185,57 +188,66 @@ public class DMSforMTG {
     }
 
 
-    private void buildDeck() { //deck building
-        System.out.println("\n--- Deck Builder ---");
-        System.out.println("Choose Format:");
-        System.out.println("1. Commander (EDH)");
-        System.out.println("2. Standard");
-        System.out.print("Enter choice (1 or 2): ");
-        String choice = scanner.nextLine();
+    private void buildDeck() {
+    System.out.println("\n--- Deck Builder ---");
+    System.out.println("Choose Format:");
+    System.out.println("1. Commander (EDH)");
+    System.out.println("2. Standard");
+    System.out.print("Enter choice (1 or 2): ");
+    String choice = scanner.nextLine();
 
-        String format = choice.equals("1") ? "Commander" : "Standard";
+    String format = choice.equals("1") ? "Commander" : "Standard";
+    System.out.print("Enter deck name: ");
+    String deckName = scanner.nextLine();
 
-        System.out.print("Enter deck name: ");
-        String deckName = scanner.nextLine();
+    Deck deck = new Deck(deckName, format);
+    List<Card> allCards = cardDAO.getAllCards();
 
-        Deck deck = new Deck(deckName, format);
+    // Commander selection
+    if (format.equals("Commander")) {
+        System.out.println("\nSelect your Commander card:");
+        allCards.forEach(c -> System.out.println("- " + c.getName()));
+        System.out.print("Enter commander card name: ");
+        String commanderName = scanner.nextLine();
 
-        if (format.equals("Commander")) {
-            System.out.println("\nSelect your Commander card (must be from your collection): ");
-            viewCollection();
-            System.out.print("Enter commander card name: ");
-            String commanderName = scanner.nextLine();
-            Optional<Card> commanderOpt = collection.stream()
-                    .filter(c -> c.getName().equalsIgnoreCase(commanderName))
-                    .findFirst();
+        Optional<Card> commanderOpt = allCards.stream()
+                .filter(c -> c.getName().equalsIgnoreCase(commanderName))
+                .findFirst();
 
-            if (commanderOpt.isPresent()) {
-                deck.setCommander(commanderOpt.get());
-                System.out.println("Commander selected: " + commanderOpt.get().getName());
-            } else {
-                System.out.println("Commander not found in collection.");
-            }
-        }
-
-        System.out.println("\nAdd cards to your " + format + " deck (type 'done' when finished):");
-        while (true) {
-            System.out.print("Enter card name to add: ");
-            String cardName = scanner.nextLine();
-            if (cardName.equalsIgnoreCase("done")) break;
-
-            Optional<Card> found = collection.stream()
-                    .filter(c -> c.getName().equalsIgnoreCase(cardName))
-                    .findFirst();
-
-            if (found.isPresent()) {
-                deck.addCard(found.get());
-            } else {
-                System.out.println("Card not found in collection.");
-            }
-        }
-
-        deck.showDeckSummary();
+        commanderOpt.ifPresent(deck::setCommander);
     }
+
+    // Save the deck first
+    int deckId = deckDAO.addDeck(deck);
+    if (deckId == -1) {
+        System.out.println("Error: Deck could not be saved.");
+        return;
+    }
+
+    // Add cards to the deck
+    System.out.println("\nAdd cards to your " + format + " deck (type 'done' when finished):");
+    while (true) {
+        System.out.print("Enter card name to add: ");
+        String cardName = scanner.nextLine();
+        if (cardName.equalsIgnoreCase("done")) break;
+
+        Optional<Card> found = allCards.stream()
+                .filter(c -> c.getName().equalsIgnoreCase(cardName))
+                .findFirst();
+
+        if (found.isPresent()) {
+            System.out.print("Enter quantity: ");
+            int quantity = Integer.parseInt(scanner.nextLine());
+            deckDAO.addCardToDeck(deckId, found.get().getCardId(), quantity);
+        } else {
+            System.out.println("Card not found.");
+        }
+    }
+
+    System.out.println("\nDeck saved successfully!");
+    deckDAO.viewDeck(deckId);
+}
+
 
     // Multi-Mana Selection Menu
     private String selectManaCost(String type) {
@@ -292,3 +304,4 @@ public class DMSforMTG {
         return manaCost.length() > 0 ? manaCost.toString() : "None";
     }
 }
+
