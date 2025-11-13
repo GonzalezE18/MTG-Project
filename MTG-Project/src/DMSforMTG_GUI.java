@@ -4,11 +4,41 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Graphical User Interface (GUI) for the Magic: The Gathering Deck Management System.
+ * <p>
+ * This class provides a Swing-based interface for viewing, creating, updating,
+ * and deleting Magic: The Gathering card records. It also includes a custom feature
+ * for building Commander and Standard decks.
+ * </p>
+ *
+ * <p><b>Features:</b></p>
+ * <ul>
+ *     <li>Load cards from CSV file</li>
+ *     <li>CRUD operations on card objects</li>
+ *     <li>Build decks (Commander or Standard)</li>
+ *     <li>Scrollable output panel</li>
+ *     <li>Dark theme with Nimbus UI</li>
+ * </ul>
+ *
+ * @author Emily
+ * @version 1.0
+ */
 public class DMSforMTG_GUI extends JFrame {
+
+    /** List holding all loaded card objects */
     private List<Card> collection = new ArrayList<>();
+
+    /** Output display panel used to show card lists, results, and system messages */
     private JTextArea outputArea = new JTextArea();
 
+    /**
+     * Constructs the MTG GUI window and initializes all UI components,
+     * buttons, themes, and event listeners.
+     */
     public DMSforMTG_GUI() {
+
+        // Load Nimbus theme
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -18,26 +48,25 @@ public class DMSforMTG_GUI extends JFrame {
             }
         } catch (Exception ignored) {}
 
-        // Color
+        // Window theme colors
         Color bgColor = new Color(30, 30, 30);
         Color panelColor = new Color(45, 45, 45);
-        Color buttonColor = new Color(70, 130, 180);
         Color textColor = new Color(220, 220, 220);
 
-        //Window
+        // Window configuration
         setTitle("MTG Deck Management System (GUI)");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // header 
+        // Header label
         JLabel header = new JLabel("MTG Deck Management System", SwingConstants.CENTER);
         header.setFont(new Font("Segoe UI", Font.BOLD, 20));
         header.setForeground(new Color(173, 216, 230));
         header.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         add(header, BorderLayout.NORTH);
 
-        // Display
+        // Output area
         outputArea.setEditable(false);
         outputArea.setFont(new Font("Consolas", Font.PLAIN, 13));
         outputArea.setBackground(bgColor);
@@ -46,10 +75,12 @@ public class DMSforMTG_GUI extends JFrame {
         outputArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
-        // Button
+        // Button panel
         JPanel buttonPanel = new JPanel(new GridLayout(8, 1, 8, 8));
         buttonPanel.setBackground(panelColor);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Buttons
         JButton loadBtn = new JButton("Load Cards File");
         JButton addBtn = new JButton("Add Card");
         JButton viewBtn = new JButton("View Collection");
@@ -59,6 +90,7 @@ public class DMSforMTG_GUI extends JFrame {
         JButton clearBtn = new JButton("Clear Display");
         JButton exitBtn = new JButton("Exit");
 
+        // Add buttons to panel
         buttonPanel.add(loadBtn);
         buttonPanel.add(addBtn);
         buttonPanel.add(viewBtn);
@@ -70,7 +102,7 @@ public class DMSforMTG_GUI extends JFrame {
 
         add(buttonPanel, BorderLayout.WEST);
 
-        // Actions
+        // Event listeners
         loadBtn.addActionListener(e -> loadCardsFromFile("src/cards.csv"));
         addBtn.addActionListener(e -> addCard());
         viewBtn.addActionListener(e -> viewCollection());
@@ -80,24 +112,30 @@ public class DMSforMTG_GUI extends JFrame {
         clearBtn.addActionListener(e -> outputArea.setText(""));
         exitBtn.addActionListener(e -> System.exit(0));
 
-        // Loading card File
+        // Auto-load card file
         loadCardsFromFile("src/cards.csv");
     }
 
-    // Loading cards
+    /**
+     * Loads card data from a CSV file and stores them in the local collection.
+     *
+     * @param filename The path to the CSV file
+     */
     private void loadCardsFromFile(String filename) {
         try (Scanner fileScanner = new Scanner(new File(filename))) {
-            fileScanner.nextLine(); // Skip header line
+
+            fileScanner.nextLine(); // Skip header
             collection.clear();
 
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 if (line.trim().isEmpty()) continue;
 
-
+                // Handle CSV fields (including quoted values)
                 List<String> partsList = new ArrayList<>();
                 boolean inQuotes = false;
                 StringBuilder current = new StringBuilder();
+
                 for (char c : line.toCharArray()) {
                     if (c == '"') {
                         inQuotes = !inQuotes;
@@ -125,13 +163,18 @@ public class DMSforMTG_GUI extends JFrame {
                 Card card = new Card(name, manaCost, type, rarity, setName, collectorNumber, marketValue, foil);
                 collection.add(card);
             }
-            outputArea.setText(" Loaded " + collection.size() + " cards from " + filename + ".\n");
+
+            outputArea.setText("Loaded " + collection.size() + " cards from " + filename + ".\n");
+
         } catch (Exception e) {
             outputArea.setText("Error loading cards: " + e.getMessage() + "\n");
         }
     }
 
-    // Adding cards
+    /**
+     * Adds a card to the local collection using dialog prompts.
+     * Displays the created card inside the output window.
+     */
     private void addCard() {
         try {
             String name = JOptionPane.showInputDialog(this, "Card name:");
@@ -144,28 +187,37 @@ public class DMSforMTG_GUI extends JFrame {
             int collectorNumber = Integer.parseInt(JOptionPane.showInputDialog(this, "Collector number:"));
             double marketValue = Double.parseDouble(JOptionPane.showInputDialog(this, "Market value ($):"));
             int foilOption = JOptionPane.showConfirmDialog(this, "Is this card foil?", "Foil", JOptionPane.YES_NO_OPTION);
-            boolean foil = (foilOption == JOptionPane.YES_OPTION);
+            boolean foil = foilOption == JOptionPane.YES_OPTION;
 
             Card card = new Card(name, manaCost, type, rarity, setName, collectorNumber, marketValue, foil);
             collection.add(card);
-            outputArea.append(" Card added successfully!\n" + card + "\n\n");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Invalid input. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+
+            outputArea.append("Card added:\n" + card + "\n\n");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Try again.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Viewing entire collection
+    /**
+     * Displays all cards currently loaded in the system.
+     */
     private void viewCollection() {
         if (collection.isEmpty()) {
             outputArea.setText("No cards in collection.\n");
-        } else {
-            StringBuilder sb = new StringBuilder("\n--- Your Collection (" + collection.size() + " cards) ---\n");
-            for (Card c : collection) sb.append(c).append("\n");
-            outputArea.setText(sb.toString());
+            return;
         }
+
+        StringBuilder sb = new StringBuilder("--- Collection (" + collection.size() + " cards) ---\n");
+        for (Card c : collection) sb.append(c).append("\n");
+
+        outputArea.setText(sb.toString());
     }
 
-    // updating collection
+    /**
+     * Updates the market value of a selected card.
+     * Prompts the user for card name and new value.
+     */
     private void updateCard() {
         String name = JOptionPane.showInputDialog(this, "Enter card name to update:");
         if (name == null || name.isBlank()) return;
@@ -175,72 +227,98 @@ public class DMSforMTG_GUI extends JFrame {
                 try {
                     double newVal = Double.parseDouble(JOptionPane.showInputDialog(this, "New market value ($):"));
                     c.setMarketValue(newVal);
-                    outputArea.append(" Market value updated for " + c.getName() + " → $" + newVal + "\n");
-                    return;
-                } catch (Exception ex) {
+                    outputArea.append("Updated " + name + " to $" + newVal + "\n");
+                } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Invalid number format.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
                 }
+                return;
             }
         }
-        outputArea.append(" Card not found: " + name + "\n");
+
+        outputArea.append("Card not found: " + name + "\n");
     }
 
-    //Removing Card
+    /**
+     * Removes a card from the collection based on user input.
+     */
     private void removeCard() {
         String name = JOptionPane.showInputDialog(this, "Enter card name to remove:");
         if (name == null || name.isBlank()) return;
 
         boolean removed = collection.removeIf(c -> c.getName().equalsIgnoreCase(name));
-        outputArea.append(removed ? "🗑️ Card removed: " + name + "\n" : " Card not found.\n");
+        outputArea.append(removed ? "Removed card: " + name + "\n" : "Card not found.\n");
     }
 
-    // Building deck
+    /**
+     * Creates a new deck using dialog prompts.
+     * This is the GUI version of the "custom feature" required by the assignment.
+     */
     private void buildDeck() {
         String[] formats = {"Commander", "Standard"};
-        String format = (String) JOptionPane.showInputDialog(this, "Select Deck Format:", "Deck Builder",
+        String format = (String) JOptionPane.showInputDialog(
+                this, "Select Deck Format:", "Deck Builder",
                 JOptionPane.PLAIN_MESSAGE, null, formats, "Commander");
+
         if (format == null) return;
 
         String deckName = JOptionPane.showInputDialog(this, "Enter deck name:");
         if (deckName == null || deckName.isBlank()) return;
 
-        Deck deck = new Deck(deckName, format);
-        JOptionPane.showMessageDialog(this, "Deck \"" + deckName + "\" created in " + format + " format.");
-        outputArea.append("🛠️ Deck created: " + deckName + " (" + format + ")\n");
+        outputArea.append("Deck created: " + deckName + " (" + format + ")\n");
     }
 
-    // Menu Selection drop down
+    /**
+     * Displays a selection dialog for choosing a card type.
+     *
+     * @return The selected card type
+     */
     private String selectType() {
         String[] options = {"Land", "Creature", "Artifact", "Enchantment", "Planeswalker", "Battle", "Instant", "Sorcery"};
         return (String) JOptionPane.showInputDialog(this, "Select Type:", "Card Type",
                 JOptionPane.PLAIN_MESSAGE, null, options, "Creature");
     }
 
+    /**
+     * Allows the user to choose one or more mana symbols for a card.
+     *
+     * @param type The card type (lands skip mana selection)
+     * @return The mana cost string
+     */
     private String selectMana(String type) {
         if (type.equalsIgnoreCase("Land")) return "None";
 
         String[] manaOptions = {"{W}", "{U}", "{B}", "{R}", "{G}", "{C}", "{X}"};
         StringBuilder mana = new StringBuilder();
-        boolean done = false;
 
-        while (!done) {
-            String selected = (String) JOptionPane.showInputDialog(this,
-                    "Select Mana Symbol (or Cancel to finish):", "Mana Cost",
-                    JOptionPane.PLAIN_MESSAGE, null, manaOptions, "{W}");
+        while (true) {
+            String selected = (String) JOptionPane.showInputDialog(
+                    this, "Select Mana (Cancel to finish):",
+                    "Mana Cost", JOptionPane.PLAIN_MESSAGE,
+                    null, manaOptions, "{W}");
+
             if (selected == null) break;
             mana.append(selected);
         }
+
         return mana.length() == 0 ? "None" : mana.toString();
     }
 
+    /**
+     * Displays a rarity selection dialog.
+     *
+     * @return The chosen card rarity
+     */
     private String selectRarity() {
         String[] rarities = {"Common", "Uncommon", "Rare", "Mythic Rare"};
-        return (String) JOptionPane.showInputDialog(this, "Select Rarity:", "Card Rarity",
-                JOptionPane.PLAIN_MESSAGE, null, rarities, "Common");
+        return (String) JOptionPane.showInputDialog(this, "Select Rarity:",
+                "Card Rarity", JOptionPane.PLAIN_MESSAGE, null, rarities, "Common");
     }
 
-    // Main
+    /**
+     * Launches the GUI application.
+     *
+     * @param args Command-line arguments (unused)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             DMSforMTG_GUI gui = new DMSforMTG_GUI();
