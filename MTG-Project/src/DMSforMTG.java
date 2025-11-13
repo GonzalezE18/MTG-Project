@@ -1,21 +1,41 @@
 import java.util.*;
 
+/**
+ * The main driver class for the Magic: The Gathering Deck Management System.
+ * <p>
+ * This class provides a text-based menu interface allowing users to perform
+ * CRUD operations (Create, Read, Update, Delete) on cards stored in a MySQL database,
+ * as well as to build and view Commander or Standard decks.
+ * </p>
+ *
+ * @author Emily Gonzalez
+ * @version 1.0
+ */
 public class DMSforMTG {
-    private List<Card> collection = new ArrayList<>();
+    /** Scanner object for user input */
     private Scanner scanner = new Scanner(System.in);
+    /** DAO for performing database operations on Card objects */
     private CardDAO cardDAO = new CardDAO();
+    /** DAO for performing database operations on Deck objects */
     private DeckDAO deckDAO = new DeckDAO();
 
-
+    /**
+     * The main entry point for the MTG Deck Management System.
+     * Initializes the system and launches the main menu loop.
+     *
+     * @param args command-line arguments (unused)
+     */
     public static void main(String[] args) {
         DMSforMTG app = new DMSforMTG();
-        app.loadCardsFromFile("src/cards.csv");
         app.run();
     }
 
+    /**
+     * Displays the main menu and handles user input to access CRUD and deck-building features.
+     */
     public void run() {
         while (true) {
-            System.out.println("\n--- MTG Deck Management System ---"); // main menu
+            System.out.println("\n--- MTG Deck Management System ---");
             System.out.println("1. Add Card");
             System.out.println("2. View Collection");
             System.out.println("3. Update Card");
@@ -24,30 +44,35 @@ public class DMSforMTG {
             System.out.println("6. Exit");
             System.out.print("Select an option: ");
 
-            int choice = Integer.parseInt(scanner.nextLine());
-            switch (choice) {
-                case 1 -> addCard();
-                case 2 -> viewCollection();
-                case 3 -> updateCard();
-                case 4 -> removeCard();
-                case 5 -> buildDeck();
-                case 6 -> {
-                    System.out.println("Exiting...");
+            String input = scanner.nextLine();
+
+            switch (input) {
+                case "1" -> addCard();
+                case "2" -> viewCollection();
+                case "3" -> updateCard();
+                case "4" -> removeCard();
+                case "5" -> buildDeck();
+                case "6" -> {
+                    System.out.println("Exiting program. Goodbye!");
                     return;
                 }
-                default -> System.out.println("Invalid option.");
+                default -> System.out.println("Invalid option. Please choose between 1 and 6.");
             }
         }
     }
 
+    /**
+     * Prompts the user to enter card information and saves the card into the MySQL database.
+     * Validates input data using {@link DMSUtils#validateCard(Card)}.
+     */
     private void addCard() {
-        System.out.print("Card name: "); //card name
+        System.out.print("Card name: ");
         String name = scanner.nextLine();
 
-        // TYPE SELECTION MENU
+        // Type selection
         String type = "";
         while (true) {
-            System.out.println("\nSelect Card Type:"); // type menu
+            System.out.println("\nSelect Card Type:");
             System.out.println("1. Land");
             System.out.println("2. Creature");
             System.out.println("3. Artifact");
@@ -55,10 +80,9 @@ public class DMSforMTG {
             System.out.println("5. Planeswalker");
             System.out.println("6. Battle");
             System.out.println("7. Spell (Instant or Sorcery)");
-            System.out.print("Enter choice (1 through 7): ");
+            System.out.print("Enter choice (1–7): ");
 
             String input = scanner.nextLine();
-
             switch (input) {
                 case "1" -> type = "Land";
                 case "2" -> type = "Creature";
@@ -72,22 +96,21 @@ public class DMSforMTG {
                     if (spellType.equals("instant") || spellType.equals("sorcery")) {
                         type = spellType.substring(0, 1).toUpperCase() + spellType.substring(1);
                     } else {
-                        System.out.println("Invalid spell type. Please choose again.");
+                        System.out.println("Invalid spell type. Try again.");
                         continue;
                     }
                 }
                 default -> {
-                    System.out.println("Invalid selection. Try again.");
+                    System.out.println("Invalid type. Try again.");
                     continue;
                 }
             }
             break;
         }
 
-        // MANA COST MENU (supports multiple)
         String manaCost = selectManaCost(type);
 
-        // RARITY MENU
+        // Rarity selection
         String rarity = "";
         while (true) {
             System.out.println("\nSelect Rarity:");
@@ -96,9 +119,9 @@ public class DMSforMTG {
             System.out.println("3. Gold = Rare");
             System.out.println("4. Orange = Mythic Rare");
             System.out.print("Enter choice (1–4): ");
-            String rarityChoice = scanner.nextLine();
+            String input = scanner.nextLine();
 
-            switch (rarityChoice) {
+            switch (input) {
                 case "1" -> rarity = "Common";
                 case "2" -> rarity = "Uncommon";
                 case "3" -> rarity = "Rare";
@@ -111,170 +134,157 @@ public class DMSforMTG {
             break;
         }
 
-        System.out.print("Set name: "); // set name 
+        System.out.print("Set name: ");
         String setName = scanner.nextLine();
+
         System.out.print("Collector Number: ");
         int collectorNumber = Integer.parseInt(scanner.nextLine());
+
         System.out.print("Market value ($): ");
         double marketValue = Double.parseDouble(scanner.nextLine());
+
         System.out.print("Is it foil? (yes/no): ");
         boolean foil = scanner.nextLine().equalsIgnoreCase("yes");
 
         Card card = new Card(name, manaCost, type, rarity, setName, collectorNumber, marketValue, foil);
 
         if (DMSUtils.validateCard(card)) {
-            collection.add(card);
-            System.out.println("Card added successfully!");
+            cardDAO.addCard(card);
         } else {
-            System.out.println("Error: Invalid card input.");
+            System.out.println("Invalid card data. Please check your input.");
         }
     }
-//view collection of cards
+
+    /**
+     * Displays all cards currently in the database.
+     */
     private void viewCollection() {
-        if (collection.isEmpty()) {
-            System.out.println("No cards in collection.");
+        List<Card> cards = cardDAO.getAllCards();
+        if (cards.isEmpty()) {
+            System.out.println("No cards found in the database.");
         } else {
             System.out.println("\n--- Your Collection ---");
-            collection.forEach(System.out::println);
-        }
-    }
-
-    private void updateCard() { //update cards market value
-        System.out.print("Enter card name to update: ");
-        String name = scanner.nextLine();
-        for (Card c : collection) {
-            if (c.getName().equalsIgnoreCase(name)) {
-                System.out.print("Enter new market value ($): ");
-                double newValue = Double.parseDouble(scanner.nextLine());
-                c.setMarketValue(newValue);
-                System.out.println("Market value updated successfully!");
-                return;
+            for (Card card : cards) {
+                System.out.println(card);
             }
         }
-        System.out.println("Card not found.");
     }
 
+    /**
+     * Updates the market value of a specified card.
+     * Prompts the user for the card name and new value.
+     */
+    private void updateCard() {
+        System.out.print("Enter card name to update: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter new market value ($): ");
+        double newValue = Double.parseDouble(scanner.nextLine());
+
+        cardDAO.updateMarketValue(name, newValue);
+    }
+
+    /**
+     * Removes a card from the database by name.
+     */
     private void removeCard() {
         System.out.print("Enter card name to remove: ");
         String name = scanner.nextLine();
-        collection.removeIf(c -> c.getName().equalsIgnoreCase(name));
-        System.out.println("Card removed (if it existed).");
+        cardDAO.deleteCard(name);
     }
 
-    private void loadCardsFromFile(String filename) {
-        System.out.println("Current working directory: " + new java.io.File(".").getAbsolutePath());
-        try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
-            fileScanner.nextLine(); // Skip header line
-            while (fileScanner.hasNextLine()) {
-                String[] parts = fileScanner.nextLine().split(",");
-                if (parts.length < 8) continue;
-
-                String name = parts[0];
-                String manaCost = parts[1];
-                String type = parts[2];
-                String rarity = parts[3];
-                String setName = parts[4];
-                int collectorNumber = Integer.parseInt(parts[5]);
-                double marketValue = Double.parseDouble(parts[6]);
-                boolean foil = Boolean.parseBoolean(parts[7]);
-
-                Card card = new Card(name, manaCost, type, rarity, setName, collectorNumber, marketValue, foil);
-                collection.add(card);
-            }
-            System.out.println("Loaded " + collection.size() + " cards from " + filename + ".");
-        } catch (Exception e) {
-            System.out.println("Error loading cards: " + e.getMessage());
-        }
-    }
-
-
+    /**
+     * Builds a deck (Commander or Standard format) and stores it in the database.
+     * The deck and its associated cards are saved using {@link DeckDAO}.
+     */
     private void buildDeck() {
-    System.out.println("\n--- Deck Builder ---");
-    System.out.println("Choose Format:");
-    System.out.println("1. Commander (EDH)");
-    System.out.println("2. Standard");
-    System.out.print("Enter choice (1 or 2): ");
-    String choice = scanner.nextLine();
+        System.out.println("\n--- Deck Builder ---");
+        System.out.println("Choose Format:");
+        System.out.println("1. Commander (EDH)");
+        System.out.println("2. Standard");
+        System.out.print("Enter choice (1 or 2): ");
+        String choice = scanner.nextLine();
 
-    String format = choice.equals("1") ? "Commander" : "Standard";
-    System.out.print("Enter deck name: ");
-    String deckName = scanner.nextLine();
+        String format = choice.equals("1") ? "Commander" : "Standard";
+        System.out.print("Enter deck name: ");
+        String deckName = scanner.nextLine();
 
-    Deck deck = new Deck(deckName, format);
-    List<Card> allCards = cardDAO.getAllCards();
+        Deck deck = new Deck(deckName, format);
+        List<Card> allCards = cardDAO.getAllCards();
 
-    // Commander selection
-    if (format.equals("Commander")) {
-        System.out.println("\nSelect your Commander card:");
-        allCards.forEach(c -> System.out.println("- " + c.getName()));
-        System.out.print("Enter commander card name: ");
-        String commanderName = scanner.nextLine();
+        // Commander selection
+        if (format.equals("Commander")) {
+            System.out.println("\nSelect your Commander card:");
+            allCards.forEach(c -> System.out.println("- " + c.getName()));
+            System.out.print("Enter commander card name: ");
+            String commanderName = scanner.nextLine();
 
-        Optional<Card> commanderOpt = allCards.stream()
-                .filter(c -> c.getName().equalsIgnoreCase(commanderName))
-                .findFirst();
+            Optional<Card> commanderOpt = allCards.stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(commanderName))
+                    .findFirst();
 
-        commanderOpt.ifPresent(deck::setCommander);
-    }
-
-    // Save the deck first
-    int deckId = deckDAO.addDeck(deck);
-    if (deckId == -1) {
-        System.out.println("Error: Deck could not be saved.");
-        return;
-    }
-
-    // Add cards to the deck
-    System.out.println("\nAdd cards to your " + format + " deck (type 'done' when finished):");
-    while (true) {
-        System.out.print("Enter card name to add: ");
-        String cardName = scanner.nextLine();
-        if (cardName.equalsIgnoreCase("done")) break;
-
-        Optional<Card> found = allCards.stream()
-                .filter(c -> c.getName().equalsIgnoreCase(cardName))
-                .findFirst();
-
-        if (found.isPresent()) {
-            System.out.print("Enter quantity: ");
-            int quantity = Integer.parseInt(scanner.nextLine());
-            deckDAO.addCardToDeck(deckId, found.get().getCardId(), quantity);
-        } else {
-            System.out.println("Card not found.");
+            commanderOpt.ifPresent(deck::setCommander);
         }
+
+        // Save deck
+        int deckId = deckDAO.addDeck(deck);
+        if (deckId == -1) {
+            System.out.println("Error: Deck could not be saved.");
+            return;
+        }
+
+        // Add cards
+        System.out.println("\nAdd cards to your " + format + " deck (type 'done' when finished):");
+        while (true) {
+            System.out.print("Enter card name to add: ");
+            String cardName = scanner.nextLine();
+            if (cardName.equalsIgnoreCase("done")) break;
+
+            Optional<Card> found = allCards.stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(cardName))
+                    .findFirst();
+
+            if (found.isPresent()) {
+                System.out.print("Enter quantity: ");
+                int quantity = Integer.parseInt(scanner.nextLine());
+                deckDAO.addCardToDeck(deckId, found.get().getCardId(), quantity);
+            } else {
+                System.out.println("Card not found.");
+            }
+        }
+
+        System.out.println("\nDeck saved successfully!");
+        deckDAO.viewDeck(deckId);
     }
 
-    System.out.println("\nDeck saved successfully!");
-    deckDAO.viewDeck(deckId);
-}
-
-
-    // Multi-Mana Selection Menu
+    /**
+     * Allows users to input multiple mana symbols for a card’s mana cost.
+     *
+     * @param type The card type (Land cards will skip mana selection)
+     * @return The formatted mana cost string
+     */
     private String selectManaCost(String type) {
         if (type.equalsIgnoreCase("Land")) {
-            return "None"; // Lands don't have a mana cost
+            return "None";
         }
 
         StringBuilder manaCost = new StringBuilder();
         while (true) {
             System.out.println("\nSelect Mana Cost Symbol (type 'done' when finished):");
-            System.out.println("1. Plains = {W} (White)");
-            System.out.println("2. Island = {U} (Blue)");
-            System.out.println("3. Swamp = {B} (Black)");
-            System.out.println("4. Mountain = {R} (Red)");
-            System.out.println("5. Forest = {G} (Green)");
+            System.out.println("1. Plains = {W}");
+            System.out.println("2. Island = {U}");
+            System.out.println("3. Swamp = {B}");
+            System.out.println("4. Mountain = {R}");
+            System.out.println("5. Forest = {G}");
             System.out.println("6. Colorless = {C}");
             System.out.println("7. Mixed / Multicolor = {X}");
-            System.out.println("8. Numeric (Enter value like 1, 2, 3 for {1}, {2}, {3})");
+            System.out.println("8. Numeric (Enter {1}, {2}, etc.)");
             System.out.print("Enter choice (1–8 or 'done'): ");
 
-            String choice = scanner.nextLine().trim().toLowerCase();
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.equals("done")) break;
 
-            if (choice.equals("done")) {
-                break;
-            }
-
-            switch (choice) {
+            switch (input) {
                 case "1" -> manaCost.append("{W}");
                 case "2" -> manaCost.append("{U}");
                 case "3" -> manaCost.append("{B}");
@@ -283,19 +293,12 @@ public class DMSforMTG {
                 case "6" -> manaCost.append("{C}");
                 case "7" -> manaCost.append("{X}");
                 case "8" -> {
-                    System.out.print("Enter numeric value (e.g. 1, 2, 3): ");
-                    String value = scanner.nextLine().trim();
-                    if (value.matches("\\d+")) {
-                        manaCost.append("{").append(value).append("}");
-                    } else {
-                        System.out.println("Invalid numeric input.");
-                        continue;
-                    }
+                    System.out.print("Enter numeric value: ");
+                    String num = scanner.nextLine().trim();
+                    if (num.matches("\\d+")) manaCost.append("{").append(num).append("}");
+                    else System.out.println("Invalid numeric input.");
                 }
-                default -> {
-                    System.out.println("Invalid option. Try again.");
-                    continue;
-                }
+                default -> System.out.println("Invalid option. Try again.");
             }
 
             System.out.println("Current mana cost: " + manaCost);
@@ -304,4 +307,3 @@ public class DMSforMTG {
         return manaCost.length() > 0 ? manaCost.toString() : "None";
     }
 }
-
