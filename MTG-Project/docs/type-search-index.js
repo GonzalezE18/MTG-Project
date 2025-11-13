@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"<Unnamed>","l":"Card"},{"p":"<Unnamed>","l":"CardDAO"},{"p":"<Unnamed>","l":"DatabaseConnection"},{"p":"<Unnamed>","l":"Deck"},{"p":"<Unnamed>","l":"DeckDAO"},{"p":"<Unnamed>","l":"DMSforMTG"},{"p":"<Unnamed>","l":"DMSforMTG_GUI"},{"p":"<Unnamed>","l":"DMSUtils"}];updateSearchResults();
