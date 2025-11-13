@@ -1,5 +1,15 @@
 import java.util.*;
 
+/**
+ * Represents a Magic: The Gathering deck.
+ * <p>
+ * Supports Commander and Standard formats, allowing users to
+ * associate cards, track a commander, and summarize contents.
+ * </p>
+ *
+ * @author Emily
+ * @version 1.0
+ */
 public class Deck {
     private int deckId;
     private String deckName;
@@ -7,55 +17,54 @@ public class Deck {
     private Card commander;
     private List<Card> cards = new ArrayList<>();
 
-    // Constructor
+    /**
+     * Constructs a new Deck object.
+     *
+     * @param deckName The name of the deck
+     * @param format   The format (Commander or Standard)
+     */
     public Deck(String deckName, String format) {
         this.deckName = deckName;
         this.format = format;
     }
 
-    // Getters and Setters
-    public int getDeckId() {
-        return deckId;
-    }
+    /** @return the deck’s unique ID */
+    public int getDeckId() { return deckId; }
 
-    public void setDeckId(int deckId) {
-        this.deckId = deckId;
-    }
+    /** @param deckId sets the deck’s unique ID */
+    public void setDeckId(int deckId) { this.deckId = deckId; }
 
-    public String getDeckName() {
-        return deckName;
-    }
+    /** @return the deck’s name */
+    public String getDeckName() { return deckName; }
 
-    public void setDeckName(String deckName) {
-        this.deckName = deckName;
-    }
+    /** @param deckName sets the deck’s name */
+    public void setDeckName(String deckName) { this.deckName = deckName; }
 
-    public String getFormat() {
-        return format;
-    }
+    /** @return the deck’s format (Commander or Standard) */
+    public String getFormat() { return format; }
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
+    /** @param format sets the deck’s format */
+    public void setFormat(String format) { this.format = format; }
 
-    public Card getCommander() {
-        return commander;
-    }
+    /** @return the Commander card */
+    public Card getCommander() { return commander; }
 
-    public void setCommander(Card commander) {
-        this.commander = commander;
-    }
+    /** @param commander sets the Commander card */
+    public void setCommander(Card commander) { this.commander = commander; }
 
-    public List<Card> getCards() {
-        return cards;
-    }
+    /** @return all cards in this deck */
+    public List<Card> getCards() { return cards; }
 
-    // Add a card to the deck
-    public void addCard(Card card) {
-        cards.add(card);
-    }
+    /**
+     * Adds a card to the deck list.
+     *
+     * @param card The {@link Card} to add
+     */
+    public void addCard(Card card) { cards.add(card); }
 
-    //Display a quick summary of the deck
+    /**
+     * Prints a simple deck summary including commander and card count.
+     */
     public void showDeckSummary() {
         System.out.println("\n--- Deck Summary ---");
         System.out.println("Deck Name: " + deckName);
@@ -67,16 +76,5 @@ public class Deck {
         for (Card c : cards) {
             System.out.println(" - " + c.getName() + " (" + c.getType() + ")");
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Deck{" +
-                "deckId=" + deckId +
-                ", deckName='" + deckName + '\'' +
-                ", format='" + format + '\'' +
-                ", commander=" + (commander != null ? commander.getName() : "None") +
-                ", totalCards=" + cards.size() +
-                '}';
     }
 }
